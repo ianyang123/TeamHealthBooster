@@ -30,6 +30,7 @@ io.on("connection", (socket) => {
 
   if (interval) {
     clearInterval(interval);
+
   }
   
   interval = setInterval(() => getApiAndEmit(socket), 1000);
@@ -50,8 +51,13 @@ io.on("connection", (socket) => {
 
 const getApiAndEmit = socket => {
   const response = new Date();
+  const gameState = {
+    line: this.line,
+    userId: this.userId,
+  };
   // Emitting a new message. Will be consumed by the client
-  socket.emit("FromAPI", response);
+  console.log("Emitting state " + response.getDate());
+  socket.emit("updateState", response); 
 };
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
