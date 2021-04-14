@@ -4,6 +4,7 @@ import Canvas from './canvas';
 import CanvasReceiver from './canvasReceiver';
 import socketIOClient from "socket.io-client";
 import GameState from './gameState';
+import StartGame from './startGame';
 class App extends Component {
 	constructor(){
 	super();
@@ -16,14 +17,8 @@ class App extends Component {
 	  <Fragment>
 		<h3 style={{ textAlign: 'center' }}>Telestration</h3>
 		<div className="state">
-
-
-		 
 		</div>
 		<div className="state">
-
-
-		 
 		</div>
 		<div className="main">
 		  <div className="color-guide">
@@ -41,11 +36,9 @@ class App extends Component {
 		  </div>
 
 		  <GameState className = "gameState" socket={this.socket}/>
-
-
-		  <GameState className = "gameState" socket={this.socket}/>
-
+		  
 		</div>
+		<StartGame className = "startGame" socket={this.socket}/>
 	  </Fragment>
 	);
   }

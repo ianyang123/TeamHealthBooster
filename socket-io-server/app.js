@@ -35,6 +35,19 @@ io.on("connection", (socket) => {
   
   interval = setInterval(() => getApiAndEmit(socket), 1000);
   
+  // socket.on("startGame", data => {
+	//   console.log(
+  //     "STARTING GAME"
+  //   );
+  // }
+  // );
+  socket.on("startGame", data => {
+	  console.log(
+      "SERVER SEES START GAME CLICK"
+    );
+  }
+  );
+
   socket.on("disconnect", () => {
     console.log("Client disconnected: ", socket.id);
     clearInterval(interval);
