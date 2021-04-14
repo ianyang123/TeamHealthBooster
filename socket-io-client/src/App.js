@@ -2,16 +2,10 @@ import React, { Component, Fragment } from 'react';
 import './App.css';
 import Canvas from './canvas';
 import CanvasReceiver from './canvasReceiver';
-import socketIOClient from "socket.io-client";
 import GameState from './gameState';
 import StartGame from './startGame';
+
 class App extends Component {
-	constructor(){
-	super();
-	let socket = socketIOClient("http://localhost:4001");
-	this.socket = socket;
- 	}
-	
   render() {
 	return (
 	  <Fragment>
@@ -28,17 +22,17 @@ class App extends Component {
 		  </div>
 		  <div>
 			<div>Your Board:</div>
-			<Canvas socket={this.socket} />
+			<Canvas/>
 		  </div>
 		  <div>
 		    <div>From Player:</div>
-			<CanvasReceiver socket={this.socket}/>
+			<CanvasReceiver/>
 		  </div>
 
-		  <GameState className = "gameState" socket={this.socket}/>
+		  <GameState className = "gameState"/>
 		  
 		</div>
-		<StartGame className = "startGame" socket={this.socket}/>
+		<StartGame className = "startGame"/>
 	  </Fragment>
 	);
   }

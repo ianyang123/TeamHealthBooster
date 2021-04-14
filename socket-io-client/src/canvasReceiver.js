@@ -1,17 +1,11 @@
 import React, { Component } from 'react';
-import { v4 } from 'uuid';
+import socket from './socket'
 
 class CanvasReceiver extends Component {
-	constructor(props) {
-	  super(props);
-	  this.socket = props.socket;
-	}
-
 	// Different stroke styles to be used for user and guest
 	guestStrokeStyle = '#F0C987';
 	line = [];	
-	// v4 creates a unique id for each user. We used this since there's no auth to tell users apart
-	userId = v4();
+	userId = socket.id;
 	prevPos = { offsetX: 0, offsetY: 0 };
 	
 	paint(prevPos, currPos, strokeStyle) {
@@ -36,7 +30,7 @@ class CanvasReceiver extends Component {
 	  this.ctx.lineCap = 'round';
 	  this.ctx.lineWidth = 5;
 
-	  this.socket.on("updatePaint", data => {
+	  socket.on("updatePaint", data => {
 		 const { userId, line } = data;
 		 if (userId !== this.userId) {
 			line.forEach((position) => {

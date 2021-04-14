@@ -1,10 +1,10 @@
   // canvas.js
   import React, { Component } from 'react';
+  import socket from './socket'
 
   class Canvas extends Component {
     constructor(props) {
       super(props);
-      this.socket = props.socket;
       this.onMouseDown = this.onMouseDown.bind(this);
       this.onMouseMove = this.onMouseMove.bind(this);
       this.endPaintEvent = this.endPaintEvent.bind(this);
@@ -62,7 +62,7 @@
     async sendPaintData() {
       const body = {
         line: this.line,
-        userId: this.socket.id,
+        userId: socket.id,
       };
 	  
 	    this.socket.emit("paint", body);
@@ -75,7 +75,7 @@
       this.ctx.lineCap = 'round';
       this.ctx.lineWidth = 5;
 
-      this.socket.on("updatePaint", data => {
+      socket.on("updatePaint", data => {
          const { userId, line } = data;
          if (userId !== this.userId) {
             line.forEach((position) => {
