@@ -9,8 +9,10 @@
       this.onMouseDown = this.onMouseDown.bind(this);
       this.onMouseMove = this.onMouseMove.bind(this);
       this.endPaintEvent = this.endPaintEvent.bind(this);
+	  this.socket = socketIOClient("http://localhost:4001");
     }
 
+    socket = socketIOClient();
     isPainting = false;
     // Different stroke styles to be used for user and guest
     userStrokeStyle = '#EE92C2';
@@ -66,36 +68,34 @@
         line: this.line,
         userId: this.userId,
       };
-	  
-	  const socket = socketIOClient("http://localhost:4001");
-	  socket.emit("paint", body);
+
+      this.socket.emit("paint", body);
     }
 
     componentDidMount() {
-      // Here we set up the properties of the canvas element. 
+      // Here we set up the properties of the canvas element.
       this.canvas.width = 1000;
       this.canvas.height = 800;
       this.ctx = this.canvas.getContext('2d');
       this.ctx.lineJoin = 'round';
       this.ctx.lineCap = 'round';
       this.ctx.lineWidth = 5;
-	  
-	  const socket = socketIOClient("http://localhost:4001");
-		socket.on("updatePaint", data => {			
-			const { userId, line } = data;
-			if (userId !== this.userId) {
-				console.log("got data");
-			    line.forEach((position) => {
-			      this.paint(position.start, position.stop, this.guestStrokeStyle);
-			    });
-			}
-		});
+
+      this.socket.on("updatePaint", data => {
+         const { userId, line } = data;
+         if (userId !== this.userId) {
+            console.log("got data");
+            line.forEach((position) => {
+              this.paint(position.start, position.stop, this.guestStrokeStyle);
+            });
+         }
+      });
     }
 
     render() {
       return (
         <canvas
-        // We use the ref attribute to get direct access to the canvas element. 
+        // We use the ref attribute to get direct access to the canvas element.
           ref={(ref) => (this.canvas = ref)}
           style={{ background: 'black' }}
           onMouseDown={this.onMouseDown}
