@@ -1,11 +1,10 @@
   // canvas.js
   import React, { Component } from 'react';
-  import { v4 } from 'uuid';
-  import socketIOClient from "socket.io-client";
 
   class Canvas extends Component {
     constructor(props) {
       super(props);
+      this.socket = props.socket;
       this.onMouseDown = this.onMouseDown.bind(this);
       this.onMouseMove = this.onMouseMove.bind(this);
       this.endPaintEvent = this.endPaintEvent.bind(this);
@@ -16,8 +15,6 @@
     userStrokeStyle = '#EE92C2';
     guestStrokeStyle = '#F0C987';
     line = [];
-    // v4 creates a unique id for each user. We used this since there's no auth to tell users apart
-    userId = v4();
     prevPos = { offsetX: 0, offsetY: 0 };
 
     onMouseDown({ nativeEvent }) {
@@ -46,6 +43,7 @@
         this.sendPaintData();
       }
     }
+    
     paint(prevPos, currPos, strokeStyle) {
       const { offsetX, offsetY } = currPos;
       const { offsetX: x, offsetY: y } = prevPos;
@@ -64,11 +62,10 @@
     async sendPaintData() {
       const body = {
         line: this.line,
-        userId: this.userId,
+        userId: this.socket.id,
       };
 	  
-	  const socket = socketIOClient("http://localhost:4001");
-	  socket.emit("paint", body);
+	    this.socket.emit("paint", body);
     }
 
     componentDidMount() {
@@ -79,11 +76,10 @@
       this.ctx.lineJoin = 'round';
       this.ctx.lineCap = 'round';
       this.ctx.lineWidth = 5;
-	  
-	  const socket = socketIOClient("http://localhost:4001");
-		socket.on("updatePaint", data => {			
+	  		
+    this.socket.on("updatePaint", data => {			
 			const { userId, line } = data;
-			if (userId !== this.userId) {
+			if (userId !== this.socket.id) {
 				console.log("got data");
 			    line.forEach((position) => {
 			      this.paint(position.start, position.stop, this.guestStrokeStyle);
