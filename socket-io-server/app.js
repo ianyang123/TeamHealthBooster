@@ -13,7 +13,7 @@ const { start } = require('repl');
 var isGameStarted = false;
 var timeNow;
 var startTime;
-var roundDurationSeconds = 60;
+var roundDurationSeconds = 10;
 app.use(index);
 
 const server = http.createServer(app);
@@ -24,20 +24,45 @@ const io = require("socket.io")(server, {
   }
 });
 
-let interval;
+
 
 var allClients = [];
+
+let interval;
+
+function getApiAndEmit() {
+  const timeNow =  Math.round((new Date().getTime())/1000);
+  var timePassed = timeNow - startTime;
+  
+  var timeRound = (timePassed % roundDurationSeconds);
+  console.log("timeRound: "+ timePassed);
+  if (timeRound == 0)
+  {
+    console.log("TIME DONE: "+ timePassed);
+    io.sockets.emit("timerExpire",""); 
+  }
+  const gameState = {
+    line: this.line,
+    userId: this.userId,
+  };
+  // Emitting a new message. Will be consumed by the client
+  //console.log("Emitting state " + response.getDate());
+  io.sockets.emit("updateState", timeRound); 
+}
+
+
+interval = setInterval(getApiAndEmit, 1000);
 
 io.on("connection", (socket) => {
   console.log("New client connected: ", socket.id);
   allClients.push(socket.id);
 
-  if (interval) {
-    clearInterval(interval);
+  // if (interval) {
+  //   clearInterval(interval);
 
-  }
+  // }
   
-  interval = setInterval(() => getApiAndEmit(socket), 1000);
+
   
   // socket.on("startGame", data => {
 	//   console.log(
@@ -49,6 +74,7 @@ io.on("connection", (socket) => {
 	  console.log(
       "SERVER SEES START GAME CLICK"
     );
+
     isGameStarted = true;
     startTime =  Math.round((new Date().getTime())/1000);
     console.log("Game starting at " + startTime);
@@ -79,22 +105,5 @@ io.on("connection", (socket) => {
   });
 });
 
-const getApiAndEmit = socket => {
-  const timeNow =  Math.round((new Date().getTime())/1000);
-  var timePassed = timeNow - startTime;
-  console.log("Timepassed: "+ timePassed);
-  var timeRound = 60 - (timePassed % roundDurationSeconds);
-  if (timeRound == 0)
-  {
-    socket.emit("timerExpire",""); 
-  }
-  const gameState = {
-    line: this.line,
-    userId: this.userId,
-  };
-  // Emitting a new message. Will be consumed by the client
-  //console.log("Emitting state " + response.getDate());
-  socket.emit("updateState", timeRound); 
-};
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
