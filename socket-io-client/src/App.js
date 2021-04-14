@@ -40,10 +40,10 @@ class App extends Component {
 			<CanvasReceiver socket={this.socket}/>
 		  </div>
 
-		  <GameState className = "gameState"/>
+		  <GameState className = "gameState" socket={this.socket}/>
 
 
-		  <GameState className = "gameState"/>
+		  <GameState className = "gameState" socket={this.socket}/>
 
 		</div>
 	  </Fragment>

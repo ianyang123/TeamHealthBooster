@@ -44,8 +44,16 @@ io.on("connection", (socket) => {
   });
 
   socket.on("paint", data => {
-	  console.log(data);
-	  io.sockets.emit('updatePaint', data);
+	  //console.log(data);
+      console.log(allClients)
+      var i = allClients.indexOf(data.userId);
+      var nextIndex = i + 2;
+      if (nextIndex > allClients.length)
+      {
+          nextIndex = 1;
+      }
+      console.log("nextIndex: " + nextIndex);
+      io.to(allClients[nextIndex]).emit('updatePaint', data);
   });
 });
 
@@ -56,7 +64,7 @@ const getApiAndEmit = socket => {
     userId: this.userId,
   };
   // Emitting a new message. Will be consumed by the client
-  console.log("Emitting state " + response.getDate());
+  //console.log("Emitting state " + response.getDate());
   socket.emit("updateState", response); 
 };
 

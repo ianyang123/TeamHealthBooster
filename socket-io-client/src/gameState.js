@@ -6,7 +6,7 @@
   class GameState extends Component {
     constructor(props) {
       super(props);
-	  this.socket = socketIOClient("http://localhost:4001");
+	  this.socket = props.socket;
       this.textarea1 = React.createRef();
       this.canvas1 = React.createRef();
       
