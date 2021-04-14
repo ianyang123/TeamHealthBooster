@@ -65,7 +65,7 @@
         userId: socket.id,
       };
 	  
-	    this.socket.emit("paint", body);
+	    socket.emit("paint", body);
     }
 
     componentDidMount() {
