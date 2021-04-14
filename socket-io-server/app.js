@@ -32,27 +32,10 @@ io.on("connection", (socket) => {
     console.log("Client disconnected");
     clearInterval(interval);
   });
-  socket.on("paint", () => {
-	  console.log("got data");
+  socket.on("paint", data => {
+	  console.log(data);
+	  io.sockets.emit('updatePaint', data);
   });
-});
-
-app.post('/paint', (req, res) => {
-  
-  //io.sockets.emit('FromAPI', "test");
-  const { userId, line } = res;
-  console.log(req.body);
-  
-  //var clientsList = io.sockets.adapter.rooms[room];
-  //var numClients = clientsList.length;
-  //var clients = io.sockets.clients();
-  //for (var client in clients) {
-	//console.log("pushing");
-  //}
-
-  //socket.emit("FromAPI", response);
-  //socket.emit('painting', 'draw', req.body);
-  //res.json(req.body);
 });
 
 const getApiAndEmit = socket => {
