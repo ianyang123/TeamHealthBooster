@@ -69,23 +69,20 @@
     }
 
     componentDidMount() {
-      // Here we set up the properties of the canvas element. 
-      this.canvas.width = 1000;
-      this.canvas.height = 800;
+      // Here we set up the properties of the canvas element.
       this.ctx = this.canvas.getContext('2d');
       this.ctx.lineJoin = 'round';
       this.ctx.lineCap = 'round';
       this.ctx.lineWidth = 5;
-	  		
-    this.socket.on("updatePaint", data => {			
-			const { userId, line } = data;
-			if (userId !== this.socket.id) {
-				console.log("got data");
-			    line.forEach((position) => {
-			      this.paint(position.start, position.stop, this.guestStrokeStyle);
-			    });
-			}
-		});
+
+      this.socket.on("updatePaint", data => {
+         const { userId, line } = data;
+         if (userId !== this.userId) {
+            line.forEach((position) => {
+              this.paint(position.start, position.stop, this.guestStrokeStyle);
+            });
+         }
+      });
     }
 
     render() {
@@ -93,7 +90,9 @@
         <canvas
         // We use the ref attribute to get direct access to the canvas element. 
           ref={(ref) => (this.canvas = ref)}
-          style={{ background: 'black' }}
+		  width={window.innerWidth * 0.4}
+		  height={window.innerHeight * 0.8}
+          style={{ background: 'white', margin: '5px', border: '2px solid #000000' }}
           onMouseDown={this.onMouseDown}
           onMouseLeave={this.endPaintEvent}
           onMouseUp={this.endPaintEvent}

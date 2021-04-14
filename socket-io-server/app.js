@@ -27,10 +27,13 @@ var allClients = [];
 io.on("connection", (socket) => {
   console.log("New client connected: ", socket.id);
   allClients.push(socket.id);
+
   if (interval) {
     clearInterval(interval);
   }
+  
   interval = setInterval(() => getApiAndEmit(socket), 1000);
+  
   socket.on("disconnect", () => {
     console.log("Client disconnected: ", socket.id);
     clearInterval(interval);
