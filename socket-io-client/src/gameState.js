@@ -20,7 +20,7 @@
       //this.textarea.textContent = "Round 1: Remaining Time: 60";
 
       socket.on("updateState", response => {
-           this.textarea.textContent = response;
+           this.textarea.textContent = "Time Remaining in Round:" + response;
            console.log(response)
         console.log("Saw updateState");
      });

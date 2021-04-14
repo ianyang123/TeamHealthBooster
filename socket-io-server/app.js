@@ -9,7 +9,11 @@ app.use(cors())
 
 const port = process.env.PORT || 4001;
 const index = require("./routes/index");
-
+const { start } = require('repl');
+var isGameStarted = false;
+var timeNow;
+var startTime;
+var roundDurationSeconds = 60;
 app.use(index);
 
 const server = http.createServer(app);
@@ -45,6 +49,11 @@ io.on("connection", (socket) => {
 	  console.log(
       "SERVER SEES START GAME CLICK"
     );
+    isGameStarted = true;
+    startTime =  Math.round((new Date().getTime())/1000);
+    console.log("Game starting at " + startTime);
+
+
   }
   );
 
@@ -71,14 +80,21 @@ io.on("connection", (socket) => {
 });
 
 const getApiAndEmit = socket => {
-  const response = new Date();
+  const timeNow =  Math.round((new Date().getTime())/1000);
+  var timePassed = timeNow - startTime;
+  console.log("Timepassed: "+ timePassed);
+  var timeRound = 60 - (timePassed % roundDurationSeconds);
+  if (timeRound == 0)
+  {
+    socket.emit("timerExpire",""); 
+  }
   const gameState = {
     line: this.line,
     userId: this.userId,
   };
   // Emitting a new message. Will be consumed by the client
   //console.log("Emitting state " + response.getDate());
-  socket.emit("updateState", response); 
+  socket.emit("updateState", timeRound); 
 };
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
