@@ -1,6 +1,7 @@
   // canvas.js
   import React, { Component } from 'react';
   import { v4 } from 'uuid';
+  import socketIOClient from "socket.io-client";
 
   class Canvas extends Component {
     constructor(props) {
@@ -65,17 +66,21 @@
         line: this.line,
         userId: this.userId,
       };
+	  
+	  const socket = socketIOClient("http://localhost:4001");
+	  socket.emit("paint", body);
+	  
       // We use the native fetch API to make requests to the server
-      const req = await fetch('http://localhost:4001/paint', {
-        method: 'post',
-        body: JSON.stringify(body),
-        headers: {
-          'content-type': 'application/json',
-        },
-      });
+      //const req = await fetch('http://localhost:4001/paint', {
+//        method: 'post',
+        //body: JSON.stringify(body),
+        //headers: {
+//          'content-type': 'application/json',
+        //},
+      //});
        // eslint-disable-next-line
-      const res = await req.json();
-      this.line = [];
+      //const res = await req.json();
+      //this.line = [];
     }
 
     componentDidMount() {
@@ -86,6 +91,19 @@
       this.ctx.lineJoin = 'round';
       this.ctx.lineCap = 'round';
       this.ctx.lineWidth = 5;
+	  
+	  const socket = socketIOClient("http://localhost:4001");
+		socket.on("FromAPI", data => {
+			console.log(data);
+		//const { userId, line } = data;
+        //if (userId !== this.userId) {
+			//console.log("got data");
+           //line.forEach((position) => {
+           //  this.paint(position.start, position.stop, this.guestStrokeStyle);
+           //});
+        //}
+		//setResponse(data);
+	  });
     }
 
     render() {
