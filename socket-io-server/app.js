@@ -1,7 +1,7 @@
+require('dotenv').config();
+
 const express = require("express");
 const http = require("http");
-//const socketIo = require("socket.io");
-//module.exports = router;
 const app = express();
 
 var cors = require('cors')
@@ -32,6 +32,11 @@ io.on("connection", (socket) => {
     console.log("Client disconnected");
     clearInterval(interval);
   });
+});
+
+app.post('/paint', (req, res) => {
+  socket.emit('painting', 'draw', req.body);
+  res.json(req.body);
 });
 
 const getApiAndEmit = socket => {
