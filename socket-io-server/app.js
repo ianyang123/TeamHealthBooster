@@ -60,10 +60,10 @@ io.on("connection", (socket) => {
 	  //console.log(data);
       console.log(allClients)
       var i = allClients.indexOf(data.userId);
-      var nextIndex = i + 2;
-      if (nextIndex > allClients.length)
+      var nextIndex = i + 1;
+      if (nextIndex >= allClients.length)
       {
-          nextIndex = 1;
+          nextIndex = 0;
       }
       console.log("nextIndex: " + nextIndex);
       io.to(allClients[nextIndex]).emit('updatePaint', data);
