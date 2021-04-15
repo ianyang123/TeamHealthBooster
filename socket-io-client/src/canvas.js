@@ -65,6 +65,8 @@
 		};
 
 		socket.emit("paint", body);
+		this.line = [];
+		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     componentDidMount() {

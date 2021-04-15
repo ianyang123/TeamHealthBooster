@@ -25,7 +25,7 @@ class CanvasReceiver extends Component {
 
 	componentDidMount() {
 	  // Here we set up the properties of the canvas element.
-	  this.ctx = this.canvas.getContext('2d');	  
+	  this.ctx = this.canvas.getContext('2d');
 	  this.ctx.lineJoin = 'round';
 	  this.ctx.lineCap = 'round';
 	  this.ctx.lineWidth = 5;
@@ -33,6 +33,7 @@ class CanvasReceiver extends Component {
 	  socket.on("updatePaint", data => {
 		 const { userId, line } = data;
 		 if (userId !== this.userId) {
+			this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 			line.forEach((position) => {
 			  this.paint(position.start, position.stop, this.guestStrokeStyle);
 			});
