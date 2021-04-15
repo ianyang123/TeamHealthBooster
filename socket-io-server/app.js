@@ -143,19 +143,22 @@ io.on("connection", (socket) => {
   });
 
   socket.on("showResult", data => {
-    var i = allClients.indexOf(data);
+    if (!isGameStarted && this.paintHistory)
+	{
+		var i = allClients.indexOf(data);
 
-    for (j = 0; j < this.paintHistory.length; j++) {
-      if (this.paintHistory[j].origin == i) {
-        const paintData = {
-          line: this.paintHistory[j].line,
-          userId: this.paintHistory[j].userId
-        };
-        io.sockets.emit('updateResult', paintData);
-        this.paintHistory.splice(j, 1);
-        break;
-      }
-    }
+		for (j = 0; j < this.paintHistory.length; j++) {
+		  if (this.paintHistory[j].origin == i) {
+			const paintData = {
+			  line: this.paintHistory[j].line,
+			  userId: this.paintHistory[j].userId
+			};
+			io.sockets.emit('updateResult', paintData);
+			this.paintHistory.splice(j, 1);
+			break;
+		  }
+		}
+	}
   });
 });
 
