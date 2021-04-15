@@ -28,6 +28,8 @@ const io = require("socket.io")(server, {
 
 var allClients = [];
 
+var randomWords = require('random-words');
+
 let interval;
 
 function getApiAndEmit() {
@@ -79,6 +81,11 @@ io.on("connection", (socket) => {
     console.log("Game starting at " + startTime);
 
 
+    const response = {
+        word: randomWords(),
+    };
+
+    socket.emit('updateWord', response);
   }
   );
 

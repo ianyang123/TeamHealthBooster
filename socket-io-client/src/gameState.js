@@ -7,7 +7,11 @@
       super(props);
       this.textarea1 = React.createRef();
       this.canvas1 = React.createRef();
-      
+
+      this.state = {
+          word: ""
+      }
+
     }
 
     componentDidMount() {
@@ -24,8 +28,13 @@
            console.log(response)
         console.log("Saw updateState");
      });
-      
 
+      socket.on("updateWord", response => {
+          console.log("got " + response.word);
+           this.setState({
+              word: "Your word: " + response.word,
+           });
+     });
     }
       
     render() {
@@ -36,7 +45,7 @@
             ref={ (ref) => (this.textarea = ref) }
             style={{ background: 'yellow' }}
             />
-
+            <td dangerouslySetInnerHTML={{__html: this.state.word}} />
           </div>
       );
     }
