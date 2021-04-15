@@ -63,6 +63,17 @@ function getApiAndEmit() {
 
 interval = setInterval(getApiAndEmit, 1000);
 
+function sendWordsOut(){
+  var dict = {};
+  allClients.forEach(element => {
+    console.log("Element: " + element);
+    dict[element] = randomWords();
+  });
+
+  io.sockets.emit("updateWord", dict);
+
+}
+
 io.on("connection", (socket) => {
     console.log("New client connected: ", socket.id);
     allClients.push(socket.id);
@@ -82,11 +93,23 @@ io.on("connection", (socket) => {
 
         console.log("Game starting at " + startTime);
 
-        const response = {
-            word: randomWords(),
-        };
+        console.log(allClients)
+        sendWordsOut();
+        // var dict = {};
 
-        socket.emit('updateWord', response);
+        // allClients.forEach(element => {
+        //   console.log("Element: " + element);
+        //   dict[element] = randomWords();
+        // });
+
+        // io.sockets.emit("updateWord", dict);
+        // const response = {
+        //   word: randomWords(),
+        // };
+
+        // socket.emit("updateWord", response);
+
+
     }
   );
 

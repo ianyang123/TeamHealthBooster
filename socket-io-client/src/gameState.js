@@ -34,14 +34,15 @@
           this.textarea.textContent = 
           "Round: " + response.CurrentRound + " of " + response.TotalRounds + " Time Remaining: " + response.RoundTimeRemaining;
         }
-        console.log(response)
+        //console.log(response)
      });
 
-      socket.on("updateWord", response => {
-          console.log("got " + response.word);
-           this.setState({
-              word: "Your word: " + response.word,
-           });
+      socket.on("updateWord", dict => {
+          console.log("GameState socket is " + socket.id )
+          console.log("got " + dict[socket.id]);
+          this.setState({
+            word: "Your word to draw: " + dict[socket.id],
+          });
      });
     }
       
