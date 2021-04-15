@@ -35,10 +35,10 @@ function getApiAndEmit() {
   var timePassed = timeNow - startTime;
   
   var timeRound = (timePassed % roundDurationSeconds);
-  console.log("timeRound: "+ timePassed);
+  
   if (timeRound == 0)
   {
-    console.log("TIME DONE: "+ timePassed);
+    console.log("timerExpire emit: "+ timeRound);
     io.sockets.emit("timerExpire",""); 
   }
   const gameState = {
@@ -46,8 +46,7 @@ function getApiAndEmit() {
     userId: this.userId,
   };
   // Emitting a new message. Will be consumed by the client
-  //console.log("Emitting state " + response.getDate());
-  io.sockets.emit("updateState", timeRound); 
+  io.sockets.emit("updateState", roundDurationSeconds-timeRound); 
 }
 
 
