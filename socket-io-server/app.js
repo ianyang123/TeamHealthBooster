@@ -13,6 +13,7 @@ const { start } = require('repl');
 var isGameStarted = false;
 var timeNow;
 var startTime;
+var currentRound = 0;
 var roundDurationSeconds = 10;
 app.use(index);
 
@@ -35,20 +36,37 @@ let interval;
 function getApiAndEmit() {
   const timeNow =  Math.round((new Date().getTime())/1000);
   var timePassed = timeNow - startTime;
-  
+
   var timeRound = (timePassed % roundDurationSeconds);
-  console.log("timeRound emit: "+ timeRound);
-  if (timeRound == 0)
+
+  //console.log("timeRound emit: "+ timeRound);
+
+  if (timeRound == 0 && isGameStarted)
   {
     console.log("timerExpire emit: "+ timeRound);
     io.sockets.emit("timerExpire",""); 
+    currentRound++;
   }
+
+  if(timePassed >= (allClients.length * roundDurationSeconds) && isGameStarted)
+  {
+    console.log("Game ended!"+ timeRound);
+    isGameStarted = false;
+    currentRound = 0;
+    io.sockets.emit("gameEnd",""); 
+  }
+  
   const gameState = {
-    line: this.line,
-    userId: this.userId,
+    GameStarted: isGameStarted,
+    CurrentRound: currentRound,
+    TotalRounds: allClients.length ,
+    RoundTimeRemaining: roundDurationSeconds-timeRound,
   };
   // Emitting a new message. Will be consumed by the client
-  io.sockets.emit("updateState", roundDurationSeconds-timeRound); 
+  // io.sockets.emit("updateState", roundDurationSeconds-timeRound); 
+  io.sockets.emit("updateState", gameState); 
+
+
 }
 
 

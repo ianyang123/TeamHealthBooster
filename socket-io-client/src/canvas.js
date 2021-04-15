@@ -78,6 +78,7 @@
 	  
 	  socket.on("timerExpire", data => {
 		this.sendPaintData();
+  
 	  });
     }
 

@@ -26,11 +26,12 @@ h5 {
   background: #F0C987;
   color: white;
 }
-.gameState {
-  display: flex;
+.state {
+  margin: 20px 80px;
   justify-content: center;
 }
 .gameState {
-  display: flex;
+  margin: 20px 40px;
+  font-size: 50px;
   justify-content: center;
 }

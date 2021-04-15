@@ -20,13 +20,22 @@
     //   this.textarea.height = 100;
     //   this.textarea.text = "HELLO";
     //   this.textarea.background = "blue";
+    
       console.log("GameState Mounted")
       //this.textarea.textContent = "Round 1: Remaining Time: 60";
 
       socket.on("updateState", response => {
-           this.textarea.textContent = "Time Remaining in Round:" + response;
-           console.log(response)
-        console.log("Saw updateState");
+
+        if(!response.GameStarted)
+        {
+          this.textarea.textContent = "Click Start Game to Begin!";
+        }
+        else
+        {
+          this.textarea.textContent = 
+          "Round: " + response.CurrentRound + " of " + response.TotalRounds + " Time Remaining: " + response.RoundTimeRemaining;
+        }
+        console.log(response)
      });
 
       socket.on("updateWord", response => {
@@ -40,12 +49,17 @@
     render() {
       return (
           <div>
-            <textarea
+
+            <h2
             // We use the ref attribute to get direct access to the canvas element.
             ref={ (ref) => (this.textarea = ref) }
-            style={{ background: 'yellow' }}
+            style={{ textAlign: 'center' }}
             />
-            <td dangerouslySetInnerHTML={{__html: this.state.word}} />
+
+            <h4 dangerouslySetInnerHTML={{__html: this.state.word}} 
+            style={{ textAlign: 'center' }}
+            />
+
           </div>
       );
     }
