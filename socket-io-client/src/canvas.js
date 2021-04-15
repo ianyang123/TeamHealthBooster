@@ -88,7 +88,7 @@
 		  // We use the ref attribute to get direct access to the canvas element. 
 		  ref={(ref) => (this.canvas = ref)}
 		  width={window.innerWidth * 0.4}
-		  height={window.innerHeight * 0.8}
+		  height={window.innerHeight * 0.6}
 		  style={{ background: 'white', margin: '5px', border: '2px solid #000000' }}
 		  onMouseDown={this.onMouseDown}
 		  onMouseLeave={this.endPaintEvent}
