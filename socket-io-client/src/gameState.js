@@ -25,7 +25,6 @@
       //this.textarea.textContent = "Round 1: Remaining Time: 60";
 
       socket.on("updateState", response => {
-
         if(!response.GameStarted)
         {
           this.textarea.textContent = "Click Start Game to Begin!";

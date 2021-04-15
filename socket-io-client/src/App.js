@@ -4,6 +4,7 @@ import Canvas from './canvas';
 import CanvasReceiver from './canvasReceiver';
 import GameState from './gameState';
 import StartGame from './startGame';
+import ShowResult from './showResult';
 
 class App extends Component {
   render() {
@@ -32,9 +33,9 @@ class App extends Component {
 		    <div>From Player:</div>
 			<CanvasReceiver/>
 		  </div>
-
 		</div>
 		<StartGame className = "startGame"/>
+		<ShowResult className = "showResult"/>
 	  </Fragment>
 	);
   }

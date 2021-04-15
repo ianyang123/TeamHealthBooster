@@ -39,6 +39,15 @@ class CanvasReceiver extends Component {
 			});
 		 }
 	  });
+	  
+	  socket.on("updateResult", data => {
+		  console.log(data);
+		const { userId, line } = data;
+		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		line.forEach((position) => {
+			this.paint(position.start, position.stop, this.guestStrokeStyle);
+		});
+	  });
 	}
 
 	render() {
