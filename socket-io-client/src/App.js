@@ -5,6 +5,7 @@ import CanvasReceiver from './canvasReceiver';
 import GameState from './gameState';
 import StartGame from './startGame';
 import ShowResult from './showResult';
+import PlayerIcons from './playerIcons';
 
 class App extends Component {
   render() {
@@ -18,9 +19,8 @@ class App extends Component {
 
 		<div className="main">
 		  <div className="color-guide">
-			<h5>Color Guide</h5>
-			<div className="user user">User</div>
-			<div className="user guest">Guest</div>
+			<h5>Players</h5>
+			<PlayerIcons/>
 			<StartGame className="startGame"/>
 			<ShowResult className="showResult"/>
 		  </div>

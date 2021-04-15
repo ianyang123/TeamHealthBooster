@@ -8,11 +8,10 @@
       this.onMouseDown = this.onMouseDown.bind(this);
       this.onMouseMove = this.onMouseMove.bind(this);
       this.endPaintEvent = this.endPaintEvent.bind(this);
+      this.userStrokeStyle= '#EE92C2';
     }
 
     isPainting = false;
-    // Different stroke styles to be used for user and guest
-    userStrokeStyle = '#EE92C2';
     guestStrokeStyle = '#F0C987';
 	line = [];
     prevPos = { offsetX: 0, offsetY: 0 };
@@ -37,6 +36,7 @@
         this.paint(this.prevPos, offSetData, this.userStrokeStyle);
       }
     }
+
     endPaintEvent() {
       if (this.isPainting) {
         this.isPainting = false;
@@ -78,8 +78,20 @@
 	  
 	  socket.on("timerExpire", data => {
 		this.sendPaintData();
-  
-	  });
+    });
+
+	  socket.on("updatePlayers", appUserColorMap => {
+    for (const [key, value] of Object.entries(appUserColorMap)) {
+      if (value === socket.id) {
+        console.log("Setting color to " + key);
+
+        this.userStrokeStyle = key;
+        break;
+      }
+    }
+		});
+
+
     }
 
     render() {
