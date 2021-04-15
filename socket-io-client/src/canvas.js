@@ -14,7 +14,7 @@
     // Different stroke styles to be used for user and guest
     userStrokeStyle = '#EE92C2';
     guestStrokeStyle = '#F0C987';
-    line = [];
+	line = [];
     prevPos = { offsetX: 0, offsetY: 0 };
 
     onMouseDown({ nativeEvent }) {
@@ -40,7 +40,6 @@
     endPaintEvent() {
       if (this.isPainting) {
         this.isPainting = false;
-        this.sendPaintData();
       }
     }
     
@@ -60,12 +59,12 @@
     }
 
     async sendPaintData() {
-      const body = {
-        line: this.line,
-        userId: socket.id,
-      };
-	  
-	    socket.emit("paint", body);
+		const body = {
+			line: this.line,
+			userId: socket.id,
+		};
+
+		socket.emit("paint", body);
     }
 
     componentDidMount() {
@@ -74,30 +73,25 @@
       this.ctx.lineJoin = 'round';
       this.ctx.lineCap = 'round';
       this.ctx.lineWidth = 5;
-
-      socket.on("updatePaint", data => {
-         const { userId, line } = data;
-         if (userId !== this.userId) {
-            line.forEach((position) => {
-              this.paint(position.start, position.stop, this.guestStrokeStyle);
-            });
-         }
-      });
+	  
+	  socket.on("timerExpire", data => {
+		this.sendPaintData();
+	  });
     }
 
     render() {
       return (
-        <canvas
-        // We use the ref attribute to get direct access to the canvas element. 
-          ref={(ref) => (this.canvas = ref)}
+		<canvas
+		  // We use the ref attribute to get direct access to the canvas element. 
+		  ref={(ref) => (this.canvas = ref)}
 		  width={window.innerWidth * 0.4}
 		  height={window.innerHeight * 0.8}
-          style={{ background: 'white', margin: '5px', border: '2px solid #000000' }}
-          onMouseDown={this.onMouseDown}
-          onMouseLeave={this.endPaintEvent}
-          onMouseUp={this.endPaintEvent}
-          onMouseMove={this.onMouseMove}
-        />
+		  style={{ background: 'white', margin: '5px', border: '2px solid #000000' }}
+		  onMouseDown={this.onMouseDown}
+		  onMouseLeave={this.endPaintEvent}
+		  onMouseUp={this.endPaintEvent}
+		  onMouseMove={this.onMouseMove}
+		/>
       );
     }
   }
