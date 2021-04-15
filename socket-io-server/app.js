@@ -37,7 +37,7 @@ function getApiAndEmit() {
   var timePassed = timeNow - startTime;
   
   var timeRound = (timePassed % roundDurationSeconds);
-  
+  console.log("timeRound emit: "+ timeRound);
   if (timeRound == 0)
   {
     console.log("timerExpire emit: "+ timeRound);
@@ -58,26 +58,18 @@ io.on("connection", (socket) => {
   console.log("New client connected: ", socket.id);
   allClients.push(socket.id);
 
-  // if (interval) {
-  //   clearInterval(interval);
-
-  // }
-  
-
-  
-  // socket.on("startGame", data => {
-	//   console.log(
-  //     "STARTING GAME"
-  //   );
-  // }
-  // );
   socket.on("startGame", data => {
 	  console.log(
       "SERVER SEES START GAME CLICK"
     );
 
-    isGameStarted = true;
-    startTime =  Math.round((new Date().getTime())/1000);
+    if(!isGameStarted)
+    {
+      isGameStarted = true;
+      startTime =  Math.round((new Date().getTime())/1000);
+    }
+
+
     console.log("Game starting at " + startTime);
 
 
@@ -91,7 +83,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("Client disconnected: ", socket.id);
-    clearInterval(interval);
+  
 
     var i = allClients.indexOf(socket.id);
     allClients.splice(i, 1);
