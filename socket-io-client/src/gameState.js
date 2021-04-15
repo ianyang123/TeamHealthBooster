@@ -7,9 +7,12 @@
       super(props);
       this.textarea1 = React.createRef();
       this.canvas1 = React.createRef();
+      this.wordChoice = "";
 
       this.state = {
-          word: ""
+          timerLabel: "Click Start Game to Begin!",
+          roundObj: "",
+          wordChoice: ""
       }
 
     }
@@ -27,22 +30,50 @@
       socket.on("updateState", response => {
         if(!response.GameStarted)
         {
-          this.textarea.textContent = "Click Start Game to Begin!";
+          this.setState({
+            timerLabel: "Click Start Game to Begin!",
+            roundObj: ""
+          });
         }
         else
         {
-          this.textarea.textContent = 
-          "Round: " + response.CurrentRound + " of " + response.TotalRounds + " Time Remaining: " + response.RoundTimeRemaining;
+          var objective = "";
+          if (response.CurrentRound == 0 && response.TotalRounds % 2 == 0) {
+              objective = "Pick a word and draw it out! ";
+              this.setState({
+                    wordChoice: this.wordChoice
+              });
+          }
+          else if (response.CurrentRound == 0 && response.TotalRounds % 2 != 0) {
+              objective = "Pick a word and write it on your board!";
+              this.setState({
+                    wordChoice: this.wordChoice
+              });
+          }
+          else if ((response.CurrentRound % 2 == 0 && response.TotalRounds % 2 == 0) ||
+            (response.CurrentRound % 2 != 0 && response.TotalRounds % 2 != 0)) {
+              objective = "Draw!";
+              this.setState({
+                    wordChoice: ""
+              });
+          }
+          else if ((response.CurrentRound % 2 == 0 && response.TotalRounds % 2 != 0) ||
+            (response.CurrentRound % 2 != 0 && response.TotalRounds % 2 == 0)){
+              objective = "Guess!";
+              this.setState({
+                    wordChoice: ""
+              });
+          }
+          this.setState({
+            timerLabel: "Round: " + (response.CurrentRound + 1) + " of " + response.TotalRounds + " Time Remaining: " + response.RoundTimeRemaining,
+            roundObj: objective
+          });
         }
         //console.log(response)
      });
 
-      socket.on("updateWord", dict => {
-          console.log("GameState socket is " + socket.id )
-          console.log("got " + dict[socket.id]);
-          this.setState({
-            word: "Your word to draw: " + dict[socket.id],
-          });
+      socket.on("updateWord", data => {
+          this.wordChoice = "Your words: " + data.word1 + ", " + data.word2;
      });
     }
       
@@ -51,15 +82,17 @@
           <div>
 
             <h2
-            // We use the ref attribute to get direct access to the canvas element.
-            ref={ (ref) => (this.textarea = ref) }
+            dangerouslySetInnerHTML={{__html: this.state.timerLabel}} 
             style={{ textAlign: 'center' }}
             />
 
-            <h4 dangerouslySetInnerHTML={{__html: this.state.word}} 
-            style={{ textAlign: 'center' }}
+            <h3 dangerouslySetInnerHTML={{__html: this.state.roundObj}} 
+            style={{ textAlign: 'center', whiteSpace: 'nowrap'}}
             />
 
+            <h3 dangerouslySetInnerHTML={{__html: this.state.wordChoice}} 
+            style={{ textAlign: 'center', whiteSpace: 'nowrap'}}
+            />
           </div>
       );
     }

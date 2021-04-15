@@ -64,14 +64,14 @@ function getApiAndEmit() {
 interval = setInterval(getApiAndEmit, 1000);
 
 function sendWordsOut(){
-  var dict = {};
   allClients.forEach(element => {
+    var data = {
+      word1: randomWords(),
+      word2: randomWords()
+    };
     console.log("Element: " + element);
-    dict[element] = randomWords();
+    io.to(element).emit('updateWord', data);
   });
-
-  io.sockets.emit("updateWord", dict);
-
 }
 
 io.on("connection", (socket) => {
