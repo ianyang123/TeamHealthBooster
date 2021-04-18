@@ -3,7 +3,6 @@ import socket from './socket'
 
 class CanvasReceiver extends Component {
     // Different stroke styles to be used for user and guest
-    guestStrokeStyle = '#F0C987';
     line = [];
     userId = socket.id;
     prevPos = { offsetX: 0, offsetY: 0 };
@@ -31,20 +30,16 @@ class CanvasReceiver extends Component {
       this.ctx.lineWidth = 5;
 
       socket.on("updatePaint", data => {
-		  console.log("updatePaint");
-         const { userId, line } = data;
-         if (userId !== this.userId) {
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            line.forEach((position) => {
-              this.paint(position.start, position.stop, this.guestStrokeStyle);
-            });
-         }
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        data.line.forEach((position) => {
+            this.paint(position.start, position.stop, data.color);
+        });
       });
 
       socket.on("updateResult", data => {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         data.line.forEach((position) => {
-            this.paint(position.start, position.stop, this.guestStrokeStyle);
+            this.paint(position.start, position.stop, data.color);
         });
       });
 

@@ -1,7 +1,6 @@
 // gameState.js
 import React, { Component } from 'react';
 import socket from './socket'
-import colors from './colors';
 
   class GameState extends Component {
     constructor(props) {
@@ -75,20 +74,6 @@ import colors from './colors';
         socket.on("updateWord", data => {
           this.wordChoice = "Your words: " + data.word1 + ", " + data.word2;
         });
-        
-        socket.on("userAdded", appUserColorMap => {
-          for (let colorIndex = 0; colorIndex < colors.length; colorIndex++) {
-            let color = colors[colorIndex];
-            let isCurrentColorInUse = appUserColorMap.hasOwnProperty(color);
-            if (!isCurrentColorInUse) {
-              appUserColorMap[color] = socket.id;
-              break;
-            }
-          }
-          socket.emit("userColorAssigned", appUserColorMap);
-        });
-
-
       }
 
       render() {

@@ -30,6 +30,44 @@ h5 {
   font-size: 50px;
   justify-content: center;
 }
+
 button { 
   width: 100%;
+}
+
+.topLeft {
+    margin-left: 20px;
+    margin-top: 20px;
+    height:100vh; 
+}
+
+label {
+    font-size: 20px;
+}
+
+input[type=text] {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: block;
+    padding:5px; 
+    border:2px solid #ccc; 
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    font-size: 18px;
+}
+
+input[type=submit] {
+    display: block;
+    padding:5px 15px; 
+    border:0 none;
+    cursor:pointer;
+    -webkit-border-radius: 5px;
+    border-radius: 5px; 
+}
+
+.button
+{
+    font-size: 24px;
+    background-color: #008CBA;
+    color:white;
 }

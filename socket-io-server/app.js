@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require("express");
 const http = require("http");
 const app = express();
+var randomColor = require('randomcolor');
 
 var cors = require('cors')
 app.use(cors())
@@ -11,7 +12,6 @@ const port = process.env.PORT || 4001;
 const index = require("./routes/index");
 const { start } = require('repl');
 var isGameStarted = false;
-var timeNow;
 var startTime;
 var currentRound = 0;
 var roundDurationSeconds = 10;
@@ -26,6 +26,8 @@ const io = require("socket.io")(server, {
 });
 
 var allClients = [];
+var userProps = [];
+
 var randomWords = require('random-words');
 let interval;
 
@@ -58,7 +60,6 @@ function getApiAndEmit() {
 }
 
 interval = setInterval(getApiAndEmit, 1000);
-let userColorMap = {};
 
 function sendWordsOut(){
   allClients.forEach(element => {
@@ -73,7 +74,6 @@ function sendWordsOut(){
 
 io.on("connection", (socket) => {
   console.log("New client connected: ", socket.id);
-  socket.emit("userAdded", userColorMap);
   allClients.push(socket.id);
 
   socket.on("startGame", data => {
@@ -95,21 +95,27 @@ io.on("connection", (socket) => {
   }
   );
 
-  socket.on("userColorAssigned", clientUserColorMap => {
-    userColorMap = clientUserColorMap;
-    io.sockets.emit("updatePlayers", userColorMap);
+  socket.on("nameEntered", nameEntered => {
+    var userProp = {
+        id: socket.id,
+        color: randomColor(),
+        name: nameEntered,
+    };
+    userProps.push(userProp);
+
+    io.sockets.emit("playerJoined", userProps);
+    io.to(socket.id).emit("enterGame", "");
   }
   );
 
   socket.on("disconnect", () => {
     console.log("Client disconnected: ", socket.id);
 
-    for (const [key, value] of Object.entries(userColorMap)) {
-      if (value === socket.id) {
-
-        delete userColorMap[key];
-        break;
-      }
+    for (i = 0; i < userProps.length; i++) {
+        if (userProps[i].id == socket.id) {
+            userProps.splice(i, 1);
+            break;
+        }
     }
 
     var i = allClients.indexOf(socket.id);
@@ -123,8 +129,14 @@ io.on("connection", (socket) => {
       nextIndex = 0;
     }
 
+    const thisUserProp = userProps.find(element => element.id === data.userId);
+    var response = {
+        color: thisUserProp.color,
+        line: data.line
+    };
+
     if (isGameStarted) {
-      io.to(allClients[nextIndex]).emit('updatePaint', data);
+      io.to(allClients[nextIndex]).emit('updatePaint', response);
     }
 
     // Find out original index
@@ -151,7 +163,8 @@ io.on("connection", (socket) => {
 		  if (this.paintHistory[j].origin == i) {
 			const paintData = {
 			  line: this.paintHistory[j].line,
-			  userId: this.paintHistory[j].userId
+			  userId: this.paintHistory[j].userId,
+              color: userProps.find(element => element.id === this.paintHistory[j].userId).color
 			};
 			io.sockets.emit('updateResult', paintData);
 			this.paintHistory.splice(j, 1);

@@ -8,11 +8,12 @@
       this.onMouseDown = this.onMouseDown.bind(this);
       this.onMouseMove = this.onMouseMove.bind(this);
       this.endPaintEvent = this.endPaintEvent.bind(this);
-      this.userStrokeStyle= '#EE92C2';
+      this.userStrokeStyle = props.userProps.reduce(function(fallback, current) {
+        return current.id == socket.id ? current.color : fallback;
+      }, '#EE92C2');
     }
 
     isPainting = false;
-    guestStrokeStyle = '#F0C987';
 	line = [];
     prevPos = { offsetX: 0, offsetY: 0 };
 
@@ -37,8 +38,20 @@
       }
     }
 
-    endPaintEvent() {
+    endPaintEvent({ nativeEvent }) {
       if (this.isPainting) {
+        const { offsetX, offsetY } = nativeEvent;
+        if (this.prevPos.offsetX === offsetX && this.prevPos.offsetY === offsetY)
+        {
+            const offSetData = { offsetX, offsetY };
+            const positionData = {
+                start: { ...this.prevPos },
+                stop: { ...offSetData },
+              };
+              // Add the position to the line array
+              this.line = this.line.concat(positionData);
+              this.paint(this.prevPos, offSetData, this.userStrokeStyle);
+        }
         this.isPainting = false;
       }
     }
@@ -79,19 +92,6 @@
 	  socket.on("timerExpire", data => {
 		this.sendPaintData();
     });
-
-	  socket.on("updatePlayers", appUserColorMap => {
-    for (const [key, value] of Object.entries(appUserColorMap)) {
-      if (value === socket.id) {
-        console.log("Setting color to " + key);
-
-        this.userStrokeStyle = key;
-        break;
-      }
-    }
-		});
-
-
     }
 
     render() {
