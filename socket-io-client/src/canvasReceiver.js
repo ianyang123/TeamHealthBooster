@@ -47,6 +47,11 @@ class CanvasReceiver extends Component {
 		  console.log("game end");
           this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       });
+
+      socket.on("clearDrawings", data => {
+        this.line = [];
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    });
     }
 
     render() {

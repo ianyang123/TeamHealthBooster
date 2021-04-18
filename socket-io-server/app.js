@@ -28,7 +28,7 @@ const io = require("socket.io")(server, {
 var allClients = [];
 var userProps = [];
 
-var randomWords = require('random-words');
+var randomPictionaryWords = require('word-pictionary-list');
 let interval;
 
 function getApiAndEmit() {
@@ -63,9 +63,10 @@ interval = setInterval(getApiAndEmit, 1000);
 
 function sendWordsOut(){
   allClients.forEach(element => {
+    var randomWords = randomPictionaryWords({ exactly: 2 });
     var data = {
-      word1: randomWords(),
-      word2: randomWords()
+      word1: randomWords[0],
+      word2: randomWords[1]
     };
     console.log("Element: " + element);
     io.to(element).emit('updateWord', data);
@@ -77,21 +78,14 @@ io.on("connection", (socket) => {
   allClients.push(socket.id);
 
   socket.on("startGame", data => {
-    console.log(
-      "SERVER SEES START GAME CLICK"
-    );
-
     if (!isGameStarted) {
       isGameStarted = true;
       startTime = Math.round((new Date().getTime()) / 1000);
       this.paintHistory = [];
       currentRound = 0;
-    }
-
-    console.log("Game starting at " + startTime);
-
-    console.log(allClients)
-    sendWordsOut();
+      io.sockets.emit("clearDrawings", "");
+      sendWordsOut();
+    }    
   }
   );
 

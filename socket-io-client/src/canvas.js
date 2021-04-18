@@ -92,6 +92,11 @@
 	  socket.on("timerExpire", data => {
 		this.sendPaintData();
     });
+
+        socket.on("clearDrawings", data => {
+            this.line = [];
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        });
     }
 
     render() {
