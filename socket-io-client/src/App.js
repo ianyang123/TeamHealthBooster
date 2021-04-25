@@ -3,6 +3,7 @@ import './App.css';
 import Canvas from './canvas';
 import CanvasReceiver from './canvasReceiver';
 import CanvasViewer from './canvasViewer';
+import CanvasEveryone from './canvasEveryone';
 import GameState from './gameState';
 import StartGame from './startGame';
 import ShowResult from './showResult';
@@ -161,7 +162,7 @@ render() {
                 </div>
                 <div className="draw-area">
                     <div>Draw here for everyone to see!</div>
-                    <Canvas
+                    <CanvasEveryone
                         userProps={this.state.userProps}
                     />
                 </div>

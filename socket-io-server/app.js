@@ -180,6 +180,16 @@ io.on("connection", (socket) => {
     this.paintHistory = this.paintHistory.concat(hist);
   });
 
+  socket.on("paintLine", data => {
+    var response = {
+        userId: data.userId,
+        line: data.line,
+        color: data.color,
+    };
+
+    io.sockets.emit("paintLine", response);
+  });
+
   socket.on("showResult", userId => {
     if (gameState !== gameStartedState && this.paintHistory)
 	{
