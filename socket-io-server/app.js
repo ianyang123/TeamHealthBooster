@@ -11,7 +11,11 @@ app.use(cors())
 const port = process.env.PORT || 4001;
 const index = require("./routes/index");
 const { start } = require('repl');
-var isGameStarted = false;
+const gameNotStartedState = "GameNotStarted"
+const gameStartedState = "GameStarted";
+const gameEndedState = "GameEnded";
+const showingResultsState = "ShowingResults";
+var gameState = gameNotStartedState;
 var startTime;
 var currentRound = 0;
 var roundDurationSeconds = 10;
@@ -27,6 +31,7 @@ const io = require("socket.io")(server, {
 
 var allClients = [];
 var userProps = [];
+var userWordsMap = new Map();
 
 var randomPictionaryWords = require('word-pictionary-list');
 let interval;
@@ -36,27 +41,27 @@ function getApiAndEmit() {
   var timePassed = timeNow - startTime;
   var timeRound = (timePassed % roundDurationSeconds);
 
-  if (timeRound == 0 && timePassed != 0 && isGameStarted) {
+  if (timeRound == 0 && timePassed != 0 && gameState === gameStartedState) {
     console.log("timerExpire emit: " + timeRound);
     io.sockets.emit("timerExpire", "");
     currentRound++;
   }
 
-  if (timePassed >= (allClients.length * roundDurationSeconds) && isGameStarted) {
+  if (timePassed >= (allClients.length * roundDurationSeconds) && gameState === gameStartedState) {
     console.log("Game ended! " + timeRound);
-    isGameStarted = false;
-    io.sockets.emit("gameEnd", "");
+    gameState = gameEndedState;
+    io.sockets.emit("gameEnded", "");
   }
 
-  const gameState = {
-    GameStarted: isGameStarted,
+  const response = {
+    GameStarted: gameState === gameStartedState,
     CurrentRound: currentRound,
     TotalRounds: allClients.length,
     RoundTimeRemaining: roundDurationSeconds - timeRound,
   };
 
   // Emitting a new message. Will be consumed by the client
-  io.sockets.emit("updateState", gameState);
+  io.sockets.emit("updateState", response);
 }
 
 interval = setInterval(getApiAndEmit, 1000);
@@ -69,8 +74,34 @@ function sendWordsOut(){
       word2: randomWords[1]
     };
     console.log("Element: " + element);
+    userWordsMap[element] = data;
     io.to(element).emit('updateWord', data);
   });
+}
+
+function constructResults(userId, paintHistory, slideIndex) {
+    var i = allClients.indexOf(userId);
+
+    var drawings = [];
+    for (j = 0; j < paintHistory.length; j++) {
+      if (paintHistory[j].origin == i) {
+        const paintData = {
+          line: paintHistory[j].line,
+          color: userProps.find(element => element.id === paintHistory[j].userId).color
+        };
+        drawings.push(paintData);
+      }
+    }
+
+    var response = {
+        name: userProps.find(element => element.id === userId).name,
+        words: userWordsMap[userId],
+        drawings: drawings,
+        owner: userId,
+        slideIndex: slideIndex
+    }
+
+    return response;
 }
 
 io.on("connection", (socket) => {
@@ -78,11 +109,12 @@ io.on("connection", (socket) => {
   allClients.push(socket.id);
 
   socket.on("startGame", data => {
-    if (!isGameStarted) {
-      isGameStarted = true;
+    if (gameState !== gameStartedState) {
+      gameState = gameStartedState;
       startTime = Math.round((new Date().getTime()) / 1000);
       this.paintHistory = [];
       currentRound = 0;
+      io.sockets.emit("enterGame", "");
       io.sockets.emit("clearDrawings", "");
       sendWordsOut();
     }    
@@ -129,7 +161,7 @@ io.on("connection", (socket) => {
         line: data.line
     };
 
-    if (isGameStarted) {
+    if (gameState === gameStartedState) {
       io.to(allClients[nextIndex]).emit('updatePaint', response);
     }
 
@@ -148,24 +180,17 @@ io.on("connection", (socket) => {
     this.paintHistory = this.paintHistory.concat(hist);
   });
 
-  socket.on("showResult", data => {
-    if (!isGameStarted && this.paintHistory)
+  socket.on("showResult", userId => {
+    if (gameState !== gameStartedState && this.paintHistory)
 	{
-		var i = allClients.indexOf(data);
-
-		for (j = 0; j < this.paintHistory.length; j++) {
-		  if (this.paintHistory[j].origin == i) {
-			const paintData = {
-			  line: this.paintHistory[j].line,
-			  userId: this.paintHistory[j].userId,
-              color: userProps.find(element => element.id === this.paintHistory[j].userId).color
-			};
-			io.sockets.emit('updateResult', paintData);
-			this.paintHistory.splice(j, 1);
-			break;
-		  }
-		}
+        gameState = showingResultsState;
+        var response = constructResults(userId, this.paintHistory, 0);
+        io.sockets.emit('updateResult', response);
 	}
+  });
+
+  socket.on("updateSlide", slideIndex => {
+    io.sockets.emit('updateSlide', slideIndex);
   });
 });
 

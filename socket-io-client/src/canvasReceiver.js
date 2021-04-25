@@ -2,6 +2,15 @@ import React, { Component } from 'react';
 import socket from './socket'
 
 class CanvasReceiver extends Component {
+    constructor(props) {
+        super(props);
+        this.canvasRef = React.createRef();
+        this.state = {
+            canvasWidth: window.innerWidth * 0.4,
+            canvasHeight: window.innerHeight * 0.6,
+        }
+      }
+
     // Different stroke styles to be used for user and guest
     line = [];
     userId = socket.id;
@@ -24,20 +33,13 @@ class CanvasReceiver extends Component {
 
     componentDidMount() {
       // Here we set up the properties of the canvas element.
-      this.ctx = this.canvas.getContext('2d');
+      this.ctx = this.canvasRef.current.getContext('2d');
       this.ctx.lineJoin = 'round';
       this.ctx.lineCap = 'round';
       this.ctx.lineWidth = 5;
 
       socket.on("updatePaint", data => {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        data.line.forEach((position) => {
-            this.paint(position.start, position.stop, data.color);
-        });
-      });
-
-      socket.on("updateResult", data => {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.clearRect(0, 0, this.state.canvasWidth, this.state.canvasHeight);
         data.line.forEach((position) => {
             this.paint(position.start, position.stop, data.color);
         });
@@ -45,12 +47,12 @@ class CanvasReceiver extends Component {
 
       socket.on("gameEnd", data => {
 		  console.log("game end");
-          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          this.ctx.clearRect(0, 0, this.state.canvasWidth, this.state.canvasHeight);
       });
 
       socket.on("clearDrawings", data => {
         this.line = [];
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.clearRect(0, 0, this.state.canvasWidth, this.state.canvasHeight);
     });
     }
 
@@ -58,9 +60,9 @@ class CanvasReceiver extends Component {
       return (
         <canvas
         // We use the ref attribute to get direct access to the canvas element.
-          ref={(ref) => (this.canvas = ref)}
-          width={window.innerWidth * 0.4}
-          height={window.innerHeight * 0.6}
+          ref={this.canvasRef}
+          width={this.state.canvasWidth}
+          height={this.state.canvasHeight}
           style={{ background: 'white', margin: '5px', border: '2px solid #000000' }}
           onMouseDown={this.onMouseDown}
           onMouseLeave={this.endPaintEvent}

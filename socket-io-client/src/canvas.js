@@ -9,8 +9,13 @@
       this.onMouseMove = this.onMouseMove.bind(this);
       this.endPaintEvent = this.endPaintEvent.bind(this);
       this.userStrokeStyle = props.userProps.reduce(function(fallback, current) {
-        return current.id == socket.id ? current.color : fallback;
+        return current.id === socket.id ? current.color : fallback;
       }, '#EE92C2');
+      this.canvasRef = React.createRef();
+      this.state = {
+          canvasWidth: window.innerWidth * 0.4,
+          canvasHeight: window.innerHeight * 0.6,
+      }
     }
 
     isPainting = false;
@@ -79,12 +84,12 @@
 
 		socket.emit("paint", body);
 		this.line = [];
-		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		this.ctx.clearRect(0, 0, this.state.canvasWidth, this.state.canvasHeight);
     }
 
     componentDidMount() {
       // Here we set up the properties of the canvas element.
-      this.ctx = this.canvas.getContext('2d');
+      this.ctx = this.canvasRef.current.getContext('2d');
       this.ctx.lineJoin = 'round';
       this.ctx.lineCap = 'round';
       this.ctx.lineWidth = 5;
@@ -95,23 +100,22 @@
 
         socket.on("clearDrawings", data => {
             this.line = [];
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.clearRect(0, 0, this.state.canvasWidth, this.state.canvasHeight);
         });
     }
 
     render() {
       return (
-		<canvas
-		  // We use the ref attribute to get direct access to the canvas element. 
-		  ref={(ref) => (this.canvas = ref)}
-		  width={window.innerWidth * 0.4}
-		  height={window.innerHeight * 0.6}
-		  style={{ background: 'white', margin: '5px', border: '2px solid #000000' }}
-		  onMouseDown={this.onMouseDown}
-		  onMouseLeave={this.endPaintEvent}
-		  onMouseUp={this.endPaintEvent}
-		  onMouseMove={this.onMouseMove}
-		/>
+        <canvas
+          ref={this.canvasRef}
+          width={this.state.canvasWidth}
+          height={this.state.canvasHeight}
+          style={{ background: 'white', margin: '5px', border: '2px solid #000000' }}
+          onMouseDown={this.onMouseDown}
+          onMouseLeave={this.endPaintEvent}
+          onMouseUp={this.endPaintEvent}
+          onMouseMove={this.onMouseMove}
+        />
       );
     }
   }

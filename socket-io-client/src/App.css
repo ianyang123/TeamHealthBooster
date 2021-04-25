@@ -5,11 +5,19 @@ body {
 }
 .main {
   display: flex;
+  flex-direction: row;
   justify-content: center;
+  height: 100vh;
 }
 .color-guide {
-  margin: 20px 5px;
+  margin: 20px 15px;
+  flex: 10%;
 }
+.draw-area {
+    flex: 45%;
+    overflow: auto;
+}  
+
 h5 {
   margin-bottom: 10px;
 }
