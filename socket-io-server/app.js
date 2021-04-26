@@ -73,7 +73,6 @@ function sendWordsOut(){
       word1: randomWords[0],
       word2: randomWords[1]
     };
-    console.log("Element: " + element);
     userWordsMap[element] = data;
     io.to(element).emit('updateWord', data);
   });
@@ -87,7 +86,9 @@ function constructResults(userId, paintHistory, slideIndex) {
       if (paintHistory[j].origin == i) {
         const paintData = {
           line: paintHistory[j].line,
-          color: userProps.find(element => element.id === paintHistory[j].userId).color
+          color: userProps.find(element => element.id === paintHistory[j].userId).color,
+          canvasWidth: paintHistory[j].canvasWidth,
+          canvasHeight: paintHistory[j].canvasHeight
         };
         drawings.push(paintData);
       }
@@ -158,7 +159,9 @@ io.on("connection", (socket) => {
     const thisUserProp = userProps.find(element => element.id === data.userId);
     var response = {
         color: thisUserProp.color,
-        line: data.line
+        line: data.line,
+        canvasWidth: data.canvasWidth,
+        canvasHeight: data.canvasHeight
     };
 
     if (gameState === gameStartedState) {
@@ -174,20 +177,16 @@ io.on("connection", (socket) => {
     const hist = {
       line: data.line,
       userId: data.userId,
-      origin: originIndex
+      origin: originIndex,
+      canvasWidth: data.canvasWidth,
+      canvasHeight: data.canvasHeight
     };
 
     this.paintHistory = this.paintHistory.concat(hist);
   });
 
   socket.on("paintLine", data => {
-    var response = {
-        userId: data.userId,
-        line: data.line,
-        color: data.color,
-    };
-
-    io.sockets.emit("paintLine", response);
+    io.sockets.emit("paintLine", data);
   });
 
   socket.on("showResult", userId => {

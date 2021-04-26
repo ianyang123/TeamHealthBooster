@@ -16,7 +16,6 @@
     }
 
     componentDidMount() {
-      console.log("Button  Mounted")
     }
     
     render() {

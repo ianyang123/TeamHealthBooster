@@ -63,6 +63,8 @@
             userId: socket.id,
 			line: this.line,
 			color: this.userStrokeStyle,
+            canvasWidth: this.state.canvasWidth,
+            canvasHeight: this.state.canvasHeight
 		};
 
 		socket.emit("paintLine", body);
@@ -88,11 +90,18 @@
             this.ctx.clearRect(0, 0, this.state.canvasWidth, this.state.canvasHeight);
         });
 
-        socket.on("paintLine", data => {            
-            const { userId, line, color } = data;
+        socket.on("paintLine", data => {           
+            const { userId, line, color, canvasWidth, canvasHeight } = data;
+
             if (userId !== this.userId) {
+                var scaleFactorX = this.state.canvasWidth / canvasWidth;
+                var scaleFactorY = this.state.canvasHeight / canvasHeight;
                 line.forEach((position) => {
-                  this.paint(position.start, position.stop, color);
+                  const { offsetX, offsetY } = position.start;
+                  const { offsetX: x, offsetY: y } = position.stop;
+                  var scaledStart = { offsetX: offsetX * scaleFactorX, offsetY: offsetY * scaleFactorY};
+                  var scaledStop = { offsetX: x * scaleFactorX, offsetY: y * scaleFactorY};
+                  this.paint(scaledStart, scaledStop, color);
                 });
             }
         });

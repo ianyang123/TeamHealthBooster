@@ -7,7 +7,6 @@ class PlayerIcons extends Component {
             <>
                 {
                     this.props.userProps.map(prop => {
-                        console.log(prop.id);
                         return <div key={prop.id} className="user" style={{ background: prop.color }}>{prop.name}</div>
                     }
                     )

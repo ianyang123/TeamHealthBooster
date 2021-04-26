@@ -8,6 +8,8 @@
       this.onMouseDown = this.onMouseDown.bind(this);
       this.onMouseMove = this.onMouseMove.bind(this);
       this.endPaintEvent = this.endPaintEvent.bind(this);
+      this.onTimerExpire = this.onTimerExpire.bind(this);
+      this.onClearDrawings = this.onClearDrawings.bind(this);
       this.userStrokeStyle = props.userProps.reduce(function(fallback, current) {
         return current.id === socket.id ? current.color : fallback;
       }, '#EE92C2');
@@ -79,12 +81,23 @@
     async sendPaintData() {
 		const body = {
 			line: this.line,
+            canvasWidth: this.state.canvasWidth,
+            canvasHeight: this.state.canvasHeight,
 			userId: socket.id,
 		};
 
 		socket.emit("paint", body);
 		this.line = [];
 		this.ctx.clearRect(0, 0, this.state.canvasWidth, this.state.canvasHeight);
+    }
+
+    onTimerExpire(data) {
+		this.sendPaintData();
+    }
+
+    onClearDrawings(data) {
+        this.line = [];
+        this.ctx.clearRect(0, 0, this.state.canvasWidth, this.state.canvasHeight);
     }
 
     componentDidMount() {
@@ -94,15 +107,14 @@
       this.ctx.lineCap = 'round';
       this.ctx.lineWidth = 5;
 	  
-	  socket.on("timerExpire", data => {
-		this.sendPaintData();
-    });
-
-        socket.on("clearDrawings", data => {
-            this.line = [];
-            this.ctx.clearRect(0, 0, this.state.canvasWidth, this.state.canvasHeight);
-        });
+	  socket.on("timerExpire", this.onTimerExpire);
+      socket.on("clearDrawings", this.onClearDrawings);
     }
+
+    componentWillUnmount() {
+        socket.off("timerExpire", this.onTimerExpire);
+        socket.off("clearDrawings", this.onClearDrawings);
+      }
 
     render() {
       return (
