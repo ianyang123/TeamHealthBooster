@@ -55,6 +55,12 @@ class App extends Component {
             });
         });
 
+        socket.on("startGame", response => {
+            this.setState({
+                gameState: "GameStarted",
+            });
+        });
+
         socket.on("playerJoined", userProps => {
             this.setState({
                 userProps: userProps,
@@ -110,6 +116,38 @@ render() {
             );
     }
     else if (this.state.gameState === "InGame")
+    {
+        return (
+            <Fragment>
+                <h3 style={{ textAlign: 'center' }}>Telestration</h3>
+        
+                <div className="state">
+                <GameState className="gameState"/>
+                </div>
+        
+                <div className="main">
+                <div className="color-guide">
+                    <h5>Players</h5>
+                    <PlayerIcons
+                        userProps={this.state.userProps}
+                    />
+                    <StartGame className="startGame"/>
+                </div>
+                <div className="draw-area">
+                    <div>Your Board:</div>
+                    <CanvasEveryone
+                        userProps={this.state.userProps}
+                    />
+                </div>
+                <div className="draw-area">
+                    <div>From Player:</div>
+                    <CanvasReceiver/>
+                </div>
+                </div>
+            </Fragment>
+            );
+    }
+    else if (this.state.gameState === "GameStarted")
     {
         return (
             <Fragment>

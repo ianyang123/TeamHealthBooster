@@ -115,7 +115,7 @@ io.on("connection", (socket) => {
       startTime = Math.round((new Date().getTime()) / 1000);
       this.paintHistory = [];
       currentRound = 0;
-      io.sockets.emit("enterGame", "");
+      io.sockets.emit("startGame", "");
       io.sockets.emit("clearDrawings", "");
       sendWordsOut();
     }    
